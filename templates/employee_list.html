@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for the dropdown */
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        /* Custom styling for prediction result */
+        .prediction-yes {
+            color: red; /* Red for 'Yes' */
+        }
+        .prediction-no {
+            color: green; /* Green for 'No' */
+        }
+        /* Center the table */
+        .table-wrapper, .result-wrapper {
+            display: flex;
+            justify-content: center;
+            padding-left: 15px; /* Adjust left gap */
+            padding-right: 15px; /* Adjust right gap */
+            margin-top: 20px; /* Increase top margin for spacing */
+        }
+        /* Table row striping */
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #ffffff; /* White for odd rows */
+        }
+        .table-striped tbody tr:nth-child(even) {
+            background-color: #f2f2f2; /* Light grey for even rows */
+        }
+        /* Header styles */
+        .table th {
+            background-color: #f3f4f6; /* Light grey */
+            font-weight: bold;
+            text-align: left;
+            padding: 12px;
+        }
+        /* Button style */
+        .btn-danger {
+            background-color: #dc3545; /* Red color */
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-danger:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+        /* Styling for flashed messages */
+        .flash-message {
+            background-color: #efffdf; /* Light green background */
+            border: 1px solid #b1dfbb; /* Light green border */
+            color: #0e803d; /* Dark green text */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        /* Fixed header styling */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000; /* High z-index to keep header on top */
+            background-color: white; /* Ensure header has a solid background */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+        }
+        /* Padding for main content to avoid overlap with fixed header */
+        .content-wrapper {
+            padding-top: 80px; /* Adjust this value based on the header's height */
+        }
+        /* Adjust margin top of the table to avoid overlap with fixed header */
+        .table-wrapper {
+            margin-top: 40px; /* Increase top margin for spacing */
+        }
+    </style>
+</head>
+<body class="bg-white font-sans">
+    <!-- Header -->
+    <header class="flex justify-between items-center p-6 bg-white shadow-md">
+        <div class="text-2xl font-bold text-gray-800">
+            HRAnalytics
+        </div>
+        <nav class="flex space-x-6 text-gray-600">
+            <a href="/" class="hover:text-gray-800">Home</a>
+            <a href="/overview" class="hover:text-gray-800">Overview</a>
+
+            <!-- Dropdown -->
+            <div class="relative dropdown">
+                <button id="dropdownButton" class="hover:text-gray-800 focus:outline-none flex items-center">
+                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 dropdown-menu">
+                    <a href="/employee_list" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Employee List</a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 text-left w-full text-left">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} flash-message" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Result Display Section -->
+        <div class="result-wrapper w-full md:w-4/5 lg:w-3/5 xl:w-2/3">
+            <div id="resultContainer" class="hidden mt-4 w-full">
+                <div id="resultDisplay" class="p-4 rounded-lg text-center">
+                    <p id="resultText" class="text-lg font-bold"></p>
+                </div>
+                <div id="saveButton" class="hidden mt-4">
+                    <button onclick="window.location.href='/add_record'" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table table-striped w-full md:w-4/5 lg:w-3/5 xl:w-2/3 border-collapse border border-gray-300">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 border-b border-gray-300">Employee ID</th>
+                        <th class="px-6 py-3 border-b border-gray-300">Name</th>
+                        <th class="px-6 py-3 border-b border-gray-300">Prediction Result</th>
+                        <th class="px-6 py-3 border-b border-gray-300">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set index = 0 %}
+                    {% for employee in employees %}
+                        <tr class="{% if index % 2 == 0 %}bg-gray-100{% endif %}">
+                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-300">{{ employee.employee_id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-300">{{ employee.employee_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-300 {% if employee.prediction_result == 'Yes' %}prediction-yes{% else %}prediction-no{% endif %}">
+                                {{ employee.prediction_result }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap border-b border-gray-300">
+                                <form method="POST" action="{{ url_for('delete_employee') }}">
+                                    <input type="hidden" name="employee_id" value="{{ employee.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% set index = index + 1 %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            setTimeout(function(){
+                $('.flash-message').fadeOut('slow');
+            }, 3000);
+        });
+
+        // JavaScript for dropdown functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButton = document.getElementById('dropdownButton');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', function (event) {
+                if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+
+            {% if 'result' in params %}
+                const resultContainer = document.getElementById('resultContainer');
+                const resultDisplay = document.getElementById('resultDisplay');
+                const saveButton = document.getElementById('saveButton');
+                const resultText = document.getElementById('resultText');
+                const result = "{{ params.result }}";
+                resultText.textContent = result;
+                if (result === "Employee may leave the organization") {
+                    resultDisplay.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-700');
+                } else {
+                    resultDisplay.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-700');
+                }
+                resultContainer.classList.remove('hidden');
+                saveButton.classList.remove('hidden');
+                resultDisplay.classList.remove('hidden');
+
+                // Hide result and save button after 5 seconds
+                setTimeout(function () {
+                    resultContainer.classList.add('transition-opacity', 'duration-1000', 'opacity-0');
+                    setTimeout(function () {
+                        resultContainer.classList.add('hidden');
+                    }, 1000); // wait for the fade out transition to complete
+                }, 5000);
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for the dropdown */
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        /* Ensure the image takes full height */
+        main {
+            min-height: calc(100vh - 4rem); /* 4rem accounts for the header height */
+        }
+        body{
+            overflow: hidden;
+        }
+        img {
+            margin-top :-20px;
+            max-width: 90%; /* Reduce width slightly */
+            max-height: 80vh; /* Reduce height slightly */
+            object-fit: contain; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body class="bg-white font-sans">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center p-6 bg-white shadow-md">
+        <div class="text-2xl font-bold text-gray-800">
+            HRAnalytics
+        </div>
+        <nav class="flex space-x-6 text-gray-600">
+            <a href="/" class="hover:text-gray-800">Home</a>
+            <a href="/overview" class="hover:text-gray-800">Overview</a>
+
+            <!-- Dropdown -->
+            <div class="relative dropdown">
+                <button id="dropdownButton" class="hover:text-gray-800 focus:outline-none flex items-center">
+                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 dropdown-menu">
+                    <a href="/employee_list" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Employee List</a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 text-left w-full text-left">
+                            Logout
+                        </button>
+                    </form>                    
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex flex-col lg:flex-row items-center justify-between px-6 py-12 lg:py-24 max-w-7xl mx-auto">
+        <div class="flex flex-col items-center lg:items-start lg:w-1/2 space-y-6 text-center lg:text-left">
+            <h1 class="text-4xl font-bold text-gray-800 leading-snug">
+                Employee Attrition
+            </h1>
+            <p class="text-gray-600 max-w-md leading-relaxed">
+                Attrition or churn is gradual workforce reduction through employee retirements, resignations, deaths or elimination of positions without immediately filling vacancies.
+            </p>
+            <div class="flex space-x-4">
+                <a href="/attrition_prediction" class="bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition no-underline">
+                    Attrition
+                </a>                
+                <a href="/churn_prediction" class="bg-transparent border-2 border-green-500 text-green-500 px-6 py-3 rounded-full hover:bg-green-500 hover:text-white transition">
+                    Churn
+                </a>   
+            </div>
+        </div>
+        <div class="mt-12 lg:mt-0 lg:w-1/2">
+            <img src="../images/employee.png" alt="Meditating Person" class="w-full">
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButton = document.getElementById('dropdownButton');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', function (event) {
+                if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

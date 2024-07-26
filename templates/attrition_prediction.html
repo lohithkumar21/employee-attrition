@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <style>
+        /* Custom styles */
+        .container {
+            max-width: 1024px; /* Increased width */
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 120px; /* Add spacing to compensate for fixed navbar */
+        }
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        header {
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="fixed top-0 left-0 right-0 flex justify-between items-center p-6 bg-white shadow-md">
+        <div class="text-2xl font-bold text-gray-800">
+            HR Analytics
+        </div>
+        <nav class="flex space-x-6 text-gray-600">
+            <a href="/" class="hover:text-gray-800">Home</a>
+            <a href="/overview" class="hover:text-gray-800">Overview</a>
+            <div class="relative dropdown">
+                <button id="dropdownButton" class="hover:text-gray-800 focus:outline-none flex items-center">
+                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 dropdown-menu">
+                    <a href="/employee_list" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Employee List</a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-left w-full text-left">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Result Display Section -->
+        <div id="resultContainer" class="hidden mt-4">
+            <div id="resultDisplay" class="p-4 rounded-lg text-center">
+                <p id="resultText" class="text-lg font-bold"></p>
+            </div>
+            <div id="saveButton" class="hidden mt-4">
+                <button onclick="window.location.href='/add_record'" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Save</button>
+            </div>
+        </div>
+
+        <form action="/attrition_predict" method="post" class="bg-white p-6 rounded shadow-md">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="age" class="block font-medium text-gray-700">Age</label>
+                    <input type="number" name="age" id="age" class="h-7 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-100" required>
+                </div>
+                <div>
+                    <label for="business_travel" class="block font-medium text-gray-700">Business Travel</label>
+                    <select name="business_travel" id="business_travel" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">Non-Travel</option>
+                        <option value="1">Travel Frequently</option>
+                        <option value="2">Travel Rarely</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="daily_rate" class="block font-medium text-gray-700">Daily Rate</label>
+                    <input type="number" name="daily_rate" id="daily_rate" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="department" class="block font-medium text-gray-700">Department</label>
+                    <select name="department" id="department" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">Human Resources</option>
+                        <option value="1">Research and Development</option>
+                        <option value="2">Sales</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="distance_from_home" class="block font-medium text-gray-700">Distance From Home</label>
+                    <input type="number" name="distance_from_home" id="distance_from_home" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="education" class="block font-medium text-gray-700">Education</label>
+                    <select name="education" id="education" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">Below College</option>
+                        <option value="2">College</option>
+                        <option value="3">Bachelor Degree</option>
+                        <option value="4">Master Degree</option>
+                        <option value="5">Doctor</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="education_field" class="block font-medium text-gray-700">Education Field</label>
+                    <select name="education_field" id="education_field" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">Life Sciences</option>
+                        <option value="2">Marketing</option>
+                        <option value="3">Medical</option>
+                        <option value="5">Technical Degree</option>
+                        <option value="4">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="environment_satisfaction" class="block font-medium text-gray-700">Environment Satisfaction</label>
+                    <select name="environment_satisfaction" id="environment_satisfaction" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="gender" class="block font-medium text-gray-700">Gender</label>
+                    <select name="gender" id="gender" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">Female</option>
+                        <option value="1">Male</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="hourly_rate" class="block font-medium text-gray-700">Hourly Rate</label>
+                    <input type="number" name="hourly_rate" id="hourly_rate" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="job_involvement" class="block font-medium text-gray-700">Job Involvement</label>
+                    <input type="number" name="job_involvement" id="job_involvement" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="job_level" class="block font-medium text-gray-700">Job Level</label>
+                    <select name="job_level" id="job_level" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="job_role" class="block font-medium text-gray-700">Job Role</label>
+                    <select name="job_role" id="job_role" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">Healthcare Representative</option>
+                        <option value="1">Human Resources</option>
+                        <option value="2">Laboratory Technician</option>
+                        <option value="3">Manager</option>
+                        <option value="4">Manufacturing Director</option>
+                        <option value="5">Research Director</option>
+                        <option value="6">Research Scientist</option>
+                        <option value="7">Sales Executive</option>
+                        <option value="8">Sales Representative</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="job_satisfaction" class="block font-medium text-gray-700">Job Satisfaction</label>
+                    <select name="job_satisfaction" id="job_satisfaction" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="marital_status" class="block font-medium text-gray-700">Marital Status</label>
+                    <select name="marital_status" id="marital_status" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">Divorced</option>
+                        <option value="1">Married</option>
+                        <option value="2">Single</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="monthly_income" class="block font-medium text-gray-700">Monthly Income</label>
+                    <input type="number" name="monthly_income" id="monthly_income" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="monthly_rate" class="block font-medium text-gray-700">Monthly Rate</label>
+                    <input type="number" name="monthly_rate" id="monthly_rate" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="num_companies_worked" class="block font-medium text-gray-700">Num Companies Worked</label>
+                    <input type="number" name="num_companies_worked" id="num_companies_worked" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="over_time" class="block font-medium text-gray-700">Over Time</label>
+                    <select name="over_time" id="over_time" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="percent_salary_hike" class="block font-medium text-gray-700">Percent Salary Hike</label>
+                    <input type="number" name="percent_salary_hike" id="percent_salary_hike" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="performance_rating" class="block font-medium text-gray-700">Performance Rating</label>
+                    <select name="performance_rating" id="performance_rating" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="relationship_satisfaction" class="block font-medium text-gray-700">Relationship Satisfaction</label>
+                    <select name="relationship_satisfaction" id="relationship_satisfaction" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="stock_option_level" class="block font-medium text-gray-700">Stock Option Level</label>
+                    <select name="stock_option_level" id="stock_option_level" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="total_working_years" class="block font-medium text-gray-700">Total Working Years</label>
+                    <input type="number" name="total_working_years" id="total_working_years" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="training_times_last_year" class="block font-medium text-gray-700">Training Times Last Year</label>
+                    <input type="number" name="training_times_last_year" id="training_times_last_year" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="work_life_balance" class="block font-medium text-gray-700">Work Life Balance</label>
+                    <select name="work_life_balance" id="work_life_balance" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="years_at_company" class="block font-medium text-gray-700">Years At Company</label>
+                    <input type="number" name="years_at_company" id="years_at_company" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="years_in_current_role" class="block font-medium text-gray-700">Years In Current Role</label>
+                    <input type="number" name="years_in_current_role" id="years_in_current_role" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="years_since_last_promotion" class="block font-medium text-gray-700">Years Since Last Promotion</label>
+                    <input type="number" name="years_since_last_promotion" id="years_since_last_promotion" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="years_with_curr_manager" class="block font-medium text-gray-700">Years With Current Manager</label>
+                    <input type="number" name="years_with_curr_manager" id="years_with_curr_manager" class="h-7 bg-gray-100 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                </div>
+                <div class="col-span-3">
+                    <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Predict</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButton = document.getElementById('dropdownButton');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+
+            {% if 'result' in params %}
+                const resultContainer = document.getElementById('resultContainer');
+                const resultDisplay = document.getElementById('resultDisplay');
+                const saveButton = document.getElementById('saveButton');
+                const resultText = document.getElementById('resultText');
+                const result = "{{ params.result }}";
+                resultText.textContent = result;
+                if (result === "Employee may leave the organization") {
+                    resultDisplay.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-700');
+                } else {
+                    resultDisplay.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-700');
+                }
+                resultContainer.classList.remove('hidden');
+                saveButton.classList.remove('hidden');
+                resultDisplay.classList.remove('hidden');
+
+                setTimeout(function () {
+                    resultContainer.classList.add('transition-opacity', 'duration-1000', 'opacity-0');
+                    setTimeout(function () {
+                        resultContainer.classList.add('hidden');
+                    }, 1000);
+                }, 5000);
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

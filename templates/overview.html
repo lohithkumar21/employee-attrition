@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Additional CSS for code block styling */
+        pre {
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+        }
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: white; /* Adjust as needed */
+            z-index: 1000; /* Ensure it's above other content */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <!-- Header -->
+    <header class="fixed-header flex justify-between items-center p-6 bg-white shadow-md">
+        <div class="text-2xl font-bold text-gray-800">
+            HRAnalytics
+        </div>
+        <nav class="flex space-x-6 text-gray-600">
+            <a href="/" class="hover:text-gray-800">Home</a>
+            <a href="/overview" class="hover:text-gray-800">Overview</a>
+    
+            <!-- Dropdown -->
+            <div class="relative dropdown">
+                <button id="dropdownButton" class="hover:text-gray-800 focus:outline-none flex items-center">
+                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 dropdown-menu">
+                    <a href="/employee_list" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Employee List</a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 text-left w-full text-left">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>    
+    <div class="container mx-auto px-4 py-8 mt-20 "> <!-- Added 'px-4' for horizontal padding -->
+        <h1 class="text-4xl font-bold mb-6">Attrition Prediction Overview</h1>
+        <div class="space-y-4">
+
+            <!-- Introduction Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Introduction</h2>
+                    <p>This notebook explores the prediction of employee attrition using various data analysis and machine learning techniques. The process involves data loading, preprocessing, model training, evaluation, and visualization.</p>
+                </div>
+            </div>
+
+            <!-- Import Libraries Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block imports the essential libraries used for data manipulation and visualization:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>pandas</b>: For data manipulation and analysis.</li>
+                    <li><b>numpy</b>: For numerical operations.</li>
+                    <li><b>matplotlib.pyplot</b>: For creating static, interactive, and animated visualizations.</li>
+                    <li><b>seaborn</b>: For making statistical plots.</li>
+                </ul>
+            </div>
+
+            <!-- Data Loading Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Data Loading</h2>
+                    <p>In this section, we load the employee dataset to begin our analysis. The data will be used to train and evaluate machine learning models to predict employee attrition.</p>
+                </div>
+            </div>
+
+            <!-- Data Loading Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+# Load the dataset
+df = pd.read_csv('employee_data.csv')
+
+# Display the first few rows of the dataframe
+df.head()
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block loads the employee dataset from a CSV file and displays the first few rows:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>pd.read_csv('employee_data.csv')</b>: Loads data from a CSV file into a DataFrame.</li>
+                    <li><b>df.head()</b>: Shows the first five rows of the DataFrame for a quick look at the data.</li>
+                </ul>
+            </div>
+
+            <!-- Data Preprocessing Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Data Preprocessing</h2>
+                    <p>Before feeding the data into a machine learning model, it is essential to preprocess it. This includes handling missing values, encoding categorical variables, and scaling numerical features.</p>
+                </div>
+            </div>
+
+            <!-- Data Preprocessing Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+# Check for missing values
+df.isnull().sum()
+
+# Fill missing values or drop columns/rows if necessary
+df.fillna(method='ffill', inplace=True)
+
+# Encode categorical variables
+df = pd.get_dummies(df, drop_first=True)
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block preprocesses the data:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>df.isnull().sum()</b>: Checks for missing values in the dataset.</li>
+                    <li><b>df.fillna(method='ffill', inplace=True)</b>: Fills missing values using forward fill method.</li>
+                    <li><b>pd.get_dummies(df, drop_first=True)</b>: Encodes categorical variables into numerical ones using one-hot encoding and drops the first column to avoid multicollinearity.</li>
+                </ul>
+            </div>
+
+            <!-- Exploratory Data Analysis Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Exploratory Data Analysis (EDA)</h2>
+                    <p>Exploratory Data Analysis is performed to understand the structure of the data and uncover patterns, trends, or relationships among the variables.</p>
+                </div>
+            </div>
+
+            <!-- Exploratory Data Analysis Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+# Plot the distribution of target variable 'Attrition'
+sns.countplot(x='Attrition', data=df)
+plt.show()
+
+# Correlation heatmap
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.show()
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block performs exploratory data analysis:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>sns.countplot(x='Attrition', data=df)</b>: Plots the distribution of the target variable 'Attrition'.</li>
+                    <li><b>sns.heatmap(df.corr(), annot=True, cmap='coolwarm')</b>: Plots a heatmap to show the correlation between different features.</li>
+                </ul>
+            </div>
+
+            <!-- Model Training Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Model Training</h2>
+                    <p>Here, we train various machine learning models on the preprocessed data to predict employee attrition. The models will be evaluated to select the best one for deployment.</p>
+                </div>
+            </div>
+
+            <!-- Model Training Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Split the data into train and test sets
+X = df.drop('Attrition', axis=1)
+y = df['Attrition']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train a RandomForestClassifier
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Predict and evaluate
+y_pred = model.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block trains a machine learning model and evaluates its performance:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>train_test_split(X, y, test_size=0.3, random_state=42)</b>: Splits the data into training and testing sets.</li>
+                    <li><b>RandomForestClassifier()</b>: Initializes a Random Forest classifier.</li>
+                    <li><b>model.fit(X_train, y_train)</b>: Trains the model on the training data.</li>
+                    <li><b>model.predict(X_test)</b>: Predicts the labels for the test set.</li>
+                    <li><b>accuracy_score(y_test, y_pred)</b>: Calculates the accuracy of the model.</li>
+                </ul>
+            </div>
+
+            <!-- Model Evaluation Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Model Evaluation</h2>
+                    <p>We evaluate the performance of the trained model using various metrics like accuracy, precision, recall, and the confusion matrix.</p>
+                </div>
+            </div>
+
+            <!-- Model Evaluation Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:\n", conf_matrix)
+
+# Classification report
+class_report = classification_report(y_test, y_pred)
+print("Classification Report:\n", class_report)
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block evaluates the model:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>confusion_matrix(y_test, y_pred)</b>: Generates a confusion matrix.</li>
+                    <li><b>classification_report(y_test, y_pred)</b>: Provides a detailed classification report including precision, recall, and F1-score.</li>
+                </ul>
+            </div>
+
+            <!-- Data Visualization Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Data Visualization</h2>
+                    <p>Visualizations help in understanding the data and the results of the machine learning models. They are crucial for presenting findings and insights effectively.</p>
+                </div>
+            </div>
+
+            <!-- Data Visualization Code Block -->
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md">
+                <pre><code class="language-python">
+# Visualize feature importance
+importances = model.feature_importances_
+features = X.columns
+indices = np.argsort(importances)
+
+plt.figure(figsize=(10, 6))
+plt.title('Feature Importance')
+plt.barh(range(len(indices)), importances[indices], color='b', align='center')
+plt.yticks(range(len(indices)), [features[i] for i in indices])
+plt.xlabel('Relative Importance')
+plt.show()
+                </code></pre>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+                <p class="text-gray-600">
+                    This code block visualizes the feature importance:
+                </p>
+                <ul class="list-disc list-inside text-gray-600">
+                    <li><b>model.feature_importances_</b>: Retrieves the feature importances from the trained model.</li>
+                    <li><b>plt.barh(...)</b>: Creates a horizontal bar plot to visualize the importance of each feature.</li>
+                </ul>
+            </div>
+
+            <!-- Conclusion Markdown Block -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="prose">
+                    <h2>Conclusion</h2>
+                    <p>This notebook demonstrated the process of predicting employee attrition using machine learning techniques. We covered data loading, preprocessing, model training, evaluation, and visualization.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButton = document.getElementById('dropdownButton');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', function (event) {
+                if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

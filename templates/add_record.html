@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for the dropdown */
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Optional: Change font family */
+        }
+        .container {
+            max-width: 100%; /* Adjusted to match full width */
+            margin: auto; /* Center align the container */
+            padding: 0; /* Removed padding */
+        }
+        .main-content {
+            margin-top: 60px; /* Reduced margin top */
+            min-height: calc(100vh - 60px); /* Adjusted to account for reduced margin */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Optional: Add padding inside main content */
+        }
+        .form-container {
+            width: 100%;
+            max-width: 400px; /* Adjust maximum width of the form */
+            padding: 20px;
+            background-color: #ffffff; /* Optional: Add background color to form container */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow for styling */
+            border-radius: 8px; /* Optional: Add border radius for rounded corners */
+        }
+        /* Fixed header styles */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            z-index: 1000; /* Ensure header is above other content */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: Add shadow for depth */
+        }
+    </style>
+</head>
+<body class="bg-white font-sans">
+
+    <!-- Header -->
+    <header class="fixed-header flex justify-between items-center p-6 bg-white shadow-md">
+        <div class="text-2xl font-bold text-gray-800">
+            HRAnalytics
+        </div>
+        <nav class="flex space-x-6 text-gray-600">
+            <a href="/" class="hover:text-gray-800">Home</a>
+            <a href="/overview" class="hover:text-gray-800">Overview</a>
+
+            <!-- Dropdown -->
+            <div class="relative dropdown">
+                <button id="dropdownButton" class="hover:text-gray-800 focus:outline-none flex items-center">
+                    <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 dropdown-menu">
+                    <a href="/employee_list" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Employee List</a>
+                    <form action="/logout" method="POST">
+                        <button type="submit" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 text-left w-full text-left">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto main-content">
+        <form method="POST" action="/save_record" class="bg-white shadow-md rounded form-container">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">Add Employee Record</h2>
+            <div class="mb-4">
+                <label for="employee_id" class="block text-gray-700 text-sm font-bold mb-2">Employee ID</label>
+                <input type="text" name="employee_id" id="employee_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div class="mb-4">
+                <label for="employee_name" class="block text-gray-700 text-sm font-bold mb-2">Employee Name</label>
+                <input type="text" name="employee_name" id="employee_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div class="flex items-center justify-center">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Record</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownButton = document.getElementById('dropdownButton');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', function (event) {
+                if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
